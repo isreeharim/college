@@ -87,17 +87,41 @@ const SEED: { college: string; category: Category; body: string; upvotes: number
   },
 ];
 
-async function seedIfEmpty() {
-  const { getSql } = await import("@/lib/db");
-  const sql = await getSql();
-  const count = await sql<{ n: number }>`select count(*)::int as n from confessions`;
-  if ((count[0]?.n ?? 0) > 0) return;
-  for (const row of SEED) {
-    await sql`
-      insert into confessions (college, category, body, upvotes)
-      values (${row.college}, ${row.category}, ${row.body}, ${row.upvotes})
-    `;
+type MemoryStore = { nextId: number; posts: Confession[] };
+
+function memoryStore(): MemoryStore {
+  const g = globalThis as typeof globalThis & { __koshBoard__?: MemoryStore };
+  if (!g.__koshBoard__) {
+    const now = new Date().toISOString();
+    g.__koshBoard__ = {
+      nextId: SEED.length + 1,
+      posts: SEED.map((row, i) => ({
+        id: i + 1,
+        college: row.college,
+        category: row.category,
+        body: row.body,
+        upvotes: row.upvotes,
+        created_at: now,
+      })),
+    };
   }
+  return g.__koshBoard__;
+}
+
+function filterPosts(posts: Confession[], college?: string, category?: string) {
+  const campus = college && college !== "Any campus" ? college : null;
+  const kind =
+    category && (CATEGORIES as readonly string[]).includes(category) ? category : null;
+  return posts
+    .filter((p) => (!campus || p.college === campus) && (!kind || p.category === kind))
+    .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
+    .slice(0, 80);
+}
+
+function useMemoryBoard() {
+  const url = typeof process !== "undefined" ? process.env.DATABASE_URL?.trim() : "";
+  const vercel = typeof process !== "undefined" && Boolean(process.env.VERCEL);
+  return Boolean(vercel && !url);
 }
 
 const listSchema = z.object({
@@ -108,48 +132,62 @@ const listSchema = z.object({
 export const listConfessions = createServerFn({ method: "GET" })
   .validator(listSchema)
   .handler(async ({ data }) => {
-    await seedIfEmpty();
-    const { getSql } = await import("@/lib/db");
-    const sql = await getSql();
-    const college = data.college && data.college !== "Any campus" ? data.college : null;
-    const category =
-      data.category && (CATEGORIES as readonly string[]).includes(data.category)
-        ? data.category
-        : null;
-
-    if (college && category) {
+    if (useMemoryBoard()) {
+      return filterPosts(memoryStore().posts, data.college, data.category);
+    }
+    try {
+      const { getSql } = await import("@/lib/db");
+      const sql = await getSql();
+      const count = await sql<{ n: number }>`select count(*)::int as n from confessions`;
+      if ((count[0]?.n ?? 0) === 0) {
+        for (const row of SEED) {
+          await sql`
+            insert into confessions (college, category, body, upvotes)
+            values (${row.college}, ${row.category}, ${row.body}, ${row.upvotes})
+          `;
+        }
+      }
+      const college = data.college && data.college !== "Any campus" ? data.college : null;
+      const category =
+        data.category && (CATEGORIES as readonly string[]).includes(data.category)
+          ? data.category
+          : null;
+      if (college && category) {
+        return sql<Confession>`
+          select id, college, category, body, upvotes, created_at
+          from confessions
+          where college = ${college} and category = ${category}
+          order by created_at desc
+          limit 80
+        `;
+      }
+      if (college) {
+        return sql<Confession>`
+          select id, college, category, body, upvotes, created_at
+          from confessions
+          where college = ${college}
+          order by created_at desc
+          limit 80
+        `;
+      }
+      if (category) {
+        return sql<Confession>`
+          select id, college, category, body, upvotes, created_at
+          from confessions
+          where category = ${category}
+          order by created_at desc
+          limit 80
+        `;
+      }
       return sql<Confession>`
         select id, college, category, body, upvotes, created_at
         from confessions
-        where college = ${college} and category = ${category}
         order by created_at desc
         limit 80
       `;
+    } catch {
+      return filterPosts(memoryStore().posts, data.college, data.category);
     }
-    if (college) {
-      return sql<Confession>`
-        select id, college, category, body, upvotes, created_at
-        from confessions
-        where college = ${college}
-        order by created_at desc
-        limit 80
-      `;
-    }
-    if (category) {
-      return sql<Confession>`
-        select id, college, category, body, upvotes, created_at
-        from confessions
-        where category = ${category}
-        order by created_at desc
-        limit 80
-      `;
-    }
-    return sql<Confession>`
-      select id, college, category, body, upvotes, created_at
-      from confessions
-      order by created_at desc
-      limit 80
-    `;
   });
 
 const createSchema = z.object({
@@ -166,14 +204,32 @@ export const createConfession = createServerFn({ method: "POST" })
     }
     const body = data.body.trim();
     if (body.length < 12) throw new Error("Write a little more");
-    const { getSql } = await import("@/lib/db");
-    const sql = await getSql();
-    const rows = await sql<Confession>`
-      insert into confessions (college, category, body)
-      values (${data.college}, ${data.category}, ${body})
-      returning id, college, category, body, upvotes, created_at
-    `;
-    return rows[0];
+    const writeMemory = () => {
+      const store = memoryStore();
+      const row: Confession = {
+        id: store.nextId++,
+        college: data.college,
+        category: data.category,
+        body,
+        upvotes: 0,
+        created_at: new Date().toISOString(),
+      };
+      store.posts.unshift(row);
+      return row;
+    };
+    if (useMemoryBoard()) return writeMemory();
+    try {
+      const { getSql } = await import("@/lib/db");
+      const sql = await getSql();
+      const rows = await sql<Confession>`
+        insert into confessions (college, category, body)
+        values (${data.college}, ${data.category}, ${body})
+        returning id, college, category, body, upvotes, created_at
+      `;
+      return rows[0];
+    } catch {
+      return writeMemory();
+    }
   });
 
 const voteSchema = z.object({
@@ -183,13 +239,24 @@ const voteSchema = z.object({
 export const upvoteConfession = createServerFn({ method: "POST" })
   .validator(voteSchema)
   .handler(async ({ data }) => {
-    const { getSql } = await import("@/lib/db");
-    const sql = await getSql();
-    const rows = await sql<Confession>`
-      update confessions
-      set upvotes = upvotes + 1
-      where id = ${data.id}
-      returning id, college, category, body, upvotes, created_at
-    `;
-    return rows[0] ?? null;
+    const bumpMemory = () => {
+      const post = memoryStore().posts.find((p) => p.id === data.id);
+      if (!post) return null;
+      post.upvotes += 1;
+      return post;
+    };
+    if (useMemoryBoard()) return bumpMemory();
+    try {
+      const { getSql } = await import("@/lib/db");
+      const sql = await getSql();
+      const rows = await sql<Confession>`
+        update confessions
+        set upvotes = upvotes + 1
+        where id = ${data.id}
+        returning id, college, category, body, upvotes, created_at
+      `;
+      return rows[0] ?? null;
+    } catch {
+      return bumpMemory();
+    }
   });
