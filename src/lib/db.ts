@@ -12,7 +12,9 @@ const databaseUrl =
 
 const onServerless = Boolean(
   typeof process !== "undefined" &&
-    (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME),
+    (process.env.VERCEL ||
+      process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      process.env.NITRO_PRESET === "vercel"),
 );
 
 /**

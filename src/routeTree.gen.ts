@@ -13,10 +13,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as CampusRouteImport } from './routes/campus'
 import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as NotesRouteImport } from './routes/notes'
 import { Route as PlannerRouteImport } from './routes/planner'
 import { Route as NotesIndexRouteImport } from './routes/notes.index'
 import { Route as NotesIdRouteImport } from './routes/notes.$id'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,6 +38,11 @@ const CampusRoute = CampusRouteImport.update({
 const JobsRoute = JobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotesRoute = NotesRouteImport.update({
@@ -58,25 +65,34 @@ const NotesIdRoute = NotesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => NotesRoute,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alerts': typeof AlertsRoute
   '/campus': typeof CampusRoute
   '/jobs': typeof JobsRoute
+  '/login': typeof LoginRoute
   '/notes': typeof NotesRouteWithChildren
   '/planner': typeof PlannerRoute
   '/notes/$id': typeof NotesIdRoute
   '/notes/': typeof NotesIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alerts': typeof AlertsRoute
   '/campus': typeof CampusRoute
   '/jobs': typeof JobsRoute
+  '/login': typeof LoginRoute
   '/planner': typeof PlannerRoute
   '/notes/$id': typeof NotesIdRoute
   '/notes': typeof NotesIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -84,10 +100,12 @@ export interface FileRoutesById {
   '/alerts': typeof AlertsRoute
   '/campus': typeof CampusRoute
   '/jobs': typeof JobsRoute
+  '/login': typeof LoginRoute
   '/notes': typeof NotesRouteWithChildren
   '/planner': typeof PlannerRoute
   '/notes/$id': typeof NotesIdRoute
   '/notes/': typeof NotesIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -96,23 +114,35 @@ export interface FileRouteTypes {
     | '/alerts'
     | '/campus'
     | '/jobs'
+    | '/login'
     | '/notes'
     | '/planner'
     | '/notes/$id'
     | '/notes/'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/alerts' | '/campus' | '/jobs' | '/planner' | '/notes/$id' | '/notes'
+    | '/'
+    | '/alerts'
+    | '/campus'
+    | '/jobs'
+    | '/login'
+    | '/planner'
+    | '/notes/$id'
+    | '/notes'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
     | '/alerts'
     | '/campus'
     | '/jobs'
+    | '/login'
     | '/notes'
     | '/planner'
     | '/notes/$id'
     | '/notes/'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -120,8 +150,10 @@ export interface RootRouteChildren {
   AlertsRoute: typeof AlertsRoute
   CampusRoute: typeof CampusRoute
   JobsRoute: typeof JobsRoute
+  LoginRoute: typeof LoginRoute
   NotesRoute: typeof NotesRouteWithChildren
   PlannerRoute: typeof PlannerRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notes': {
       id: '/notes'
       path: '/notes'
@@ -182,6 +221,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotesIdRouteImport
       parentRoute: typeof NotesRoute
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -202,8 +248,10 @@ const rootRouteChildren: RootRouteChildren = {
   AlertsRoute: AlertsRoute,
   CampusRoute: CampusRoute,
   JobsRoute: JobsRoute,
+  LoginRoute: LoginRoute,
   NotesRoute: NotesRouteWithChildren,
   PlannerRoute: PlannerRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

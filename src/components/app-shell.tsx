@@ -19,6 +19,8 @@ import { upcomingDeadlines } from "@/lib/data/deadlines";
 import { COLLEGES } from "@/lib/data/colleges";
 import { useHydrateStores } from "@/lib/hydrate";
 import { usePrefs } from "@/lib/stores/prefs";
+import { UserButton } from "@/lib/auth/gates";
+import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { cn, relativeDeadline } from "@/lib/utils";
 
 const NAV = [
@@ -35,6 +37,19 @@ const MOBILE_NAV = NAV.filter((n) => n.to !== "/alerts");
 function isActive(pathname: string, to: string) {
   if (to === "/") return pathname === "/";
   return pathname === to || pathname.startsWith(`${to}/`);
+}
+
+function AuthSlot() {
+  const { user, isPending } = useCurrentUserState();
+  if (isPending) {
+    return <div className="size-8 shrink-0 animate-pulse rounded-full bg-secondary" />;
+  }
+  if (user) return <UserButton />;
+  return (
+    <Button asChild size="sm" variant="outline">
+      <Link to="/login">Sign in</Link>
+    </Button>
+  );
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -156,6 +171,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </ul>
               </PopoverContent>
             </Popover>
+            <AuthSlot />
           </div>
         </header>
 
