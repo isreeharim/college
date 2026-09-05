@@ -11,7 +11,7 @@ import { AppShell } from "@/components/app-shell";
 import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "Kosh";
+const APP_NAME = "College Centre";
 
 const queryClient = new QueryClient({
   defaultOptions: {

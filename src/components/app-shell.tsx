@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Link to="/" className="mb-8 flex items-center gap-2.5 px-2">
           <LogoMark className="size-8 text-primary" />
           <span className="font-display text-2xl font-medium tracking-tight">
-            Kosh
+            College Centre
           </span>
         </Link>
         <nav className="flex flex-1 flex-col gap-1">
@@ -84,7 +84,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-border bg-background/90 px-4 backdrop-blur-sm md:h-16 md:px-8">
           <Link to="/" className="flex items-center gap-2 md:hidden">
             <LogoMark className="size-7 text-primary" />
-            <span className="font-display text-xl font-medium">Kosh</span>
+            <span className="font-display text-xl font-medium">College Centre</span>
           </Link>
           <div className="ml-auto flex items-center gap-2">
             <SelectField

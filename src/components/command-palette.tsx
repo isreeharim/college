@@ -41,7 +41,7 @@ export function CommandPalette({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="gap-0 p-0 sm:max-w-lg">
         <DialogHeader className="sr-only">
-          <DialogTitle>Search Kosh</DialogTitle>
+          <DialogTitle>Search College Centre</DialogTitle>
           <DialogDescription>Jump to notes, jobs, or pages</DialogDescription>
         </DialogHeader>
         <div className="flex items-center gap-2 border-b border-border px-3">
