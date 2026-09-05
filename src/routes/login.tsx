@@ -64,7 +64,33 @@ function Login() {
         <p className="mt-8 text-sm text-muted-foreground">Sign-in is disabled.</p>
       ) : (
         <div className="mt-8 space-y-3">
-          {GROK_PROVIDERS.map((p) => (
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 w-full"
+            disabled={busy}
+            onClick={() => {
+              setBusy(true);
+              setError(null);
+              void authClient.signIn
+                .social({ provider: "google", callbackURL: "/" })
+                .then((res) => {
+                  if (res.error) throw new Error(res.error.message || "Google sign-in failed");
+                  if (res.data?.url) window.location.href = res.data.url;
+                })
+                .catch((err) => {
+                  setError(
+                    err instanceof Error
+                      ? err.message
+                      : "Google sign-in is not connected yet",
+                  );
+                  setBusy(false);
+                });
+            }}
+          >
+            Continue with Google
+          </Button>
+          {GROK_PROVIDERS.filter((p) => p.idp !== "google").map((p) => (
             <Button
               key={p.providerId}
               type="button"
