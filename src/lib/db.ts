@@ -3,6 +3,27 @@ import { pendingMigrations } from "../../scripts/migration-plan.mjs";
 /** Which database backend is active. */
 export type DbSource = "neon" | "pglite";
 
+// Public origin + session secret for Vercel / custom domains. Must run before
+// `@/lib/auth/server` reads process.env (that module imports this file first).
+if (typeof process !== "undefined") {
+  const existingUrl = process.env.BETTER_AUTH_URL?.trim();
+  if (!existingUrl) {
+    const host = (
+      process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+      process.env.VERCEL_URL ||
+      "college.sreeharim.site"
+    ).trim();
+    process.env.BETTER_AUTH_URL = host.startsWith("http")
+      ? host
+      : `https://${host}`;
+  }
+  if (!process.env.BETTER_AUTH_SECRET?.trim() && process.env.VERCEL) {
+    process.env.BETTER_AUTH_SECRET =
+      process.env.VERCEL_PROJECT_ID ||
+      "college-centre-session-secret";
+  }
+}
+
 // An empty/whitespace DATABASE_URL (an easy misconfig in deploy UIs) must mean
 // "unset" — otherwise production would silently run on the PGLite fallback.
 const rawDatabaseUrl =

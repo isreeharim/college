@@ -70,7 +70,15 @@ function Login() {
               type="button"
               variant="outline"
               className="h-11 w-full"
-              onClick={() => signIn(p.providerId, { callbackURL: "/" })}
+              disabled={busy}
+              onClick={() => {
+                setBusy(true);
+                setError(null);
+                void signIn(p.providerId, { callbackURL: "/" }).catch((err) => {
+                  setError(err instanceof Error ? err.message : "Sign-in failed");
+                  setBusy(false);
+                });
+              }}
             >
               Continue with {p.label}
             </Button>
