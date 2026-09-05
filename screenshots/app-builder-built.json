@@ -1,0 +1,38 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Kosh",
+      "hasCanvas": false,
+      "bodyTextLen": 2165,
+      "bodyTextHash": "5078b17a21f2ea32372dea73a47ba802fbb7e912b9c39e9e0a5511c3921de20b",
+      "bodyTextPrefix": "Kosh Home Notes Jobs Alerts Planner Campus Notes, jobs, scholars",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Kosh",
+      "hasCanvas": false,
+      "bodyTextLen": 1899,
+      "bodyTextHash": "9926d7b124e28fbd6fe61d6549823647a67ee22b08524d60c6c3fdaa15ffcc21",
+      "bodyTextPrefix": "Kosh SATURDAY, 5 SEPTEMBER Good afternoon. Anna University · 0 s",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": false,
+  "baselineReasons": []
+}
