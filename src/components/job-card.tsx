@@ -1,9 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Bookmark } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { JobCard as JobCardType } from "@/lib/types";
-import { cn } from "@/lib/utils";
 
 export function JobCard({
   job,
@@ -15,51 +12,46 @@ export function JobCard({
   onApply?: () => void;
 }) {
   return (
-    <article className="rounded-2xl border border-border bg-card p-4 shadow-card">
+    <article className="rounded-[15px] border border-border bg-card p-[21px]">
       <div className="flex items-start justify-between gap-3">
         <div>
+          <p className="text-xs text-muted-foreground">{job.company}</p>
           <Link
             to="/jobs/$id"
             params={{ id: job.id }}
-            className="font-display text-lg font-medium leading-snug tracking-tight"
+            className="mt-2 block text-lg font-semibold leading-snug tracking-tight"
           >
             {job.title}
           </Link>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {job.company} · {job.location}
-          </p>
         </div>
-        <span
-          className={cn(
-            "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
-            job.match.total >= 80
-              ? "bg-accent text-primary"
-              : "bg-secondary text-foreground",
-          )}
-        >
+        <span className="h-max rounded-[7px] bg-accent px-2 py-1.5 text-[11px] font-extrabold">
           {job.match.total}% match
         </span>
       </div>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        <Badge variant="outline">{job.salary}</Badge>
-        <Badge variant="outline">{job.workMode}</Badge>
-        {job.fresherOk ? <Badge variant="outline">Fresher</Badge> : null}
-        <Badge variant="outline">{job.category}</Badge>
+      <p className="mt-3 text-[13px] leading-relaxed text-[#666]">
+        {job.location}
+        <br />
+        {job.salary} · {job.jobType}
+      </p>
+      <div className="mt-3.5 flex flex-wrap gap-1.5">
+        {job.skills.split(",").slice(0, 3).map((tag) => (
+          <span key={tag} className="rounded-md bg-secondary px-2 py-1 text-[11px]">
+            {tag.trim()}
+          </span>
+        ))}
       </div>
-      <p className="mt-3 text-xs text-faint">Posted {job.postedAt}</p>
       <div className="mt-4 flex gap-2">
         {onSave ? (
-          <Button type="button" variant="outline" size="sm" onClick={onSave}>
-            <Bookmark className={cn("size-4", job.saved && "fill-current")} />
+          <Button type="button" variant="outline" size="sm" className="flex-1 rounded-lg font-semibold" onClick={onSave}>
             {job.saved ? "Saved" : "Save"}
           </Button>
         ) : null}
         {onApply ? (
-          <Button type="button" size="sm" className="flex-1" onClick={onApply}>
-            {job.applicationStatus ? job.applicationStatus : "Apply"}
+          <Button type="button" size="sm" className="flex-1 rounded-lg font-semibold" onClick={onApply}>
+            {job.applicationStatus ? "Applied" : "Apply now"}
           </Button>
         ) : (
-          <Button asChild size="sm" className="flex-1">
+          <Button asChild size="sm" className="flex-1 rounded-lg font-semibold">
             <Link to="/jobs/$id" params={{ id: job.id }}>
               View
             </Link>

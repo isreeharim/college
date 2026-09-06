@@ -7,7 +7,7 @@ import {
   LayoutDashboard,
   Search,
 } from "lucide-react";
-import { LogoMark } from "@/components/logo";
+import { Wordmark } from "@/components/logo";
 import { UserButton } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { Button } from "@/components/ui/button";
@@ -23,11 +23,11 @@ const APP_NAV = [
 
 function AuthSlot() {
   const { user, isPending } = useCurrentUserState();
-  if (isPending) return <div className="size-8 animate-pulse rounded-full bg-secondary" />;
+  if (isPending) return <div className="size-9 animate-pulse rounded-[10px] bg-secondary" />;
   if (user) return <UserButton />;
   return (
-    <Button asChild size="sm" variant="outline">
-      <Link to="/login">Sign in</Link>
+    <Button asChild size="sm" variant="outline" className="rounded-[10px]">
+      <Link to="/login">Profile</Link>
     </Button>
   );
 }
@@ -35,17 +35,19 @@ function AuthSlot() {
 export function MarketingChrome({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh bg-background">
-      <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background/90 px-4 backdrop-blur-sm">
-        <Link to="/" className="flex items-center gap-2">
-          <LogoMark className="size-8 text-primary" />
-          <span className="font-display text-lg font-medium">CollegeCentre</span>
+      <header className="sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-border bg-card px-[6%]">
+        <Link to="/" className="flex items-center">
+          <Wordmark />
         </Link>
-        <div className="ml-auto flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-            <Link to="/pricing">Pricing</Link>
-          </Button>
+        <nav className="flex items-center gap-4 sm:gap-6">
+          <Link to="/pricing" className="hidden text-sm text-[#333] sm:inline">
+            Pricing
+          </Link>
+          <Link to="/login" className="hidden text-sm text-[#333] sm:inline">
+            Jobs
+          </Link>
           <AuthSlot />
-        </div>
+        </nav>
       </header>
       {children}
     </div>
@@ -56,17 +58,14 @@ export function StudentChrome({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <div className="min-h-dvh bg-background pb-20">
-      <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background/90 px-4 backdrop-blur-sm">
-        <Link to="/dashboard" className="flex items-center gap-2">
-          <LogoMark className="size-7 text-primary" />
-          <span className="font-display text-lg font-medium">CollegeCentre</span>
+      <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border bg-card px-4">
+        <Link to="/dashboard">
+          <Wordmark />
         </Link>
-        <div className="ml-auto">
-          <AuthSlot />
-        </div>
+        <AuthSlot />
       </header>
-      <main className="mx-auto w-full max-w-lg px-4 py-5">{children}</main>
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 px-1 pt-1 pb-[max(0.4rem,env(safe-area-inset-bottom))] backdrop-blur-sm">
+      <main className="mx-auto w-full max-w-lg px-4 py-5 md:max-w-5xl">{children}</main>
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card px-1 pt-1 pb-[max(0.4rem,env(safe-area-inset-bottom))]">
         <ul className="mx-auto grid max-w-lg grid-cols-5">
           {APP_NAV.map((item) => {
             const Icon = item.icon;
@@ -78,10 +77,10 @@ export function StudentChrome({ children }: { children: ReactNode }) {
                   to={item.to}
                   className={cn(
                     "flex min-h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-medium",
-                    active ? "text-primary" : "text-muted-foreground",
+                    active ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
-                  <Icon className="size-5" strokeWidth={active ? 2 : 1.6} />
+                  <Icon className="size-5" strokeWidth={active ? 2.2 : 1.6} />
                   {item.label}
                 </Link>
               </li>

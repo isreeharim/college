@@ -12,7 +12,7 @@ import { AppShell } from "@/components/app-shell";
 import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "College Centre";
+const APP_NAME = "CollegeCentre Jobs";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,7 +42,7 @@ export const Route = createRootRoute({
         content:
           "₹199 unlocks 24 hours of fresher job discovery. Your tracker stays forever.",
       },
-      { name: "theme-color", content: "#F3EFE6" },
+      { name: "theme-color", content: "#f7f7f4" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -54,7 +54,7 @@ export const Route = createRootRoute({
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
       },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },

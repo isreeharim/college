@@ -2,33 +2,35 @@
 @import "tw-animate-css";
 
 @theme {
-  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 
-  --color-background: #f3efe6;
-  --color-foreground: #1a1814;
-  --color-card: #fffaf3;
-  --color-card-foreground: #1a1814;
-  --color-popover: #fffaf3;
-  --color-popover-foreground: #1a1814;
-  --color-primary: #2d4a3e;
-  --color-primary-foreground: #f3efe6;
-  --color-secondary: #ebe6db;
-  --color-secondary-foreground: #1a1814;
-  --color-muted: #ebe6db;
-  --color-muted-foreground: #6f6a62;
-  --color-accent: #e4ede8;
-  --color-accent-foreground: #1a1814;
+  --color-background: #f7f7f4;
+  --color-foreground: #111111;
+  --color-card: #ffffff;
+  --color-card-foreground: #111111;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #111111;
+  --color-primary: #111111;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f4f4f0;
+  --color-secondary-foreground: #111111;
+  --color-muted: #f4f4f0;
+  --color-muted-foreground: #6c6c67;
+  --color-accent: #f0f0ec;
+  --color-accent-foreground: #111111;
   --color-destructive: #8f2d2d;
-  --color-destructive-foreground: #fffaf3;
-  --color-border: #ddd6c8;
-  --color-input: #ddd6c8;
-  --color-ring: #2d4a3e;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #dddcd5;
+  --color-input: #dddcd5;
+  --color-ring: #111111;
   --color-good: #2d5a3d;
   --color-warn: #8a5a20;
-  --color-faint: #9a948a;
-  --color-sidebar: #ece7dc;
+  --color-faint: #777777;
+  --color-sidebar: #ffffff;
+  --color-ink: #111111;
+  --color-wash: #e8e8e1;
 
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
@@ -78,8 +80,9 @@
   h3 {
     text-wrap: pretty;
     font-family: var(--font-display);
-    letter-spacing: -0.03em;
-    line-height: 1.15;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    font-weight: 750;
   }
 
   p {
