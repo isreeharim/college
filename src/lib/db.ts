@@ -42,6 +42,12 @@ if (typeof process !== "undefined") {
     );
     if (alias) process.env.DATABASE_URL = alias;
   }
+  if (process.env.DATABASE_URL) {
+    process.env.DATABASE_URL = process.env.DATABASE_URL
+      .replace(/[?&]channel_binding=require/g, "")
+      .replace(/\?&/, "?")
+      .replace(/\?$/, "");
+  }
 }
 
 // An empty/whitespace DATABASE_URL (an easy misconfig in deploy UIs) must mean
