@@ -10,14 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AlertsRouteImport } from './routes/alerts'
-import { Route as CampusRouteImport } from './routes/campus'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as ApplicationsRouteImport } from './routes/applications'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as NotesRouteImport } from './routes/notes'
-import { Route as PlannerRouteImport } from './routes/planner'
-import { Route as NotesIndexRouteImport } from './routes/notes.index'
-import { Route as NotesIdRouteImport } from './routes/notes.$id'
+import { Route as PayRouteImport } from './routes/pay'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as SavedRouteImport } from './routes/saved'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as JobsIndexRouteImport } from './routes/jobs.index'
+import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -25,14 +29,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AlertsRoute = AlertsRouteImport.update({
-  id: '/alerts',
-  path: '/alerts',
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CampusRoute = CampusRouteImport.update({
-  id: '/campus',
-  path: '/campus',
+const ApplicationsRoute = ApplicationsRouteImport.update({
+  id: '/applications',
+  path: '/applications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobsRoute = JobsRouteImport.update({
@@ -45,25 +54,40 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NotesRoute = NotesRouteImport.update({
-  id: '/notes',
-  path: '/notes',
+const PayRoute = PayRouteImport.update({
+  id: '/pay',
+  path: '/pay',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlannerRoute = PlannerRouteImport.update({
-  id: '/planner',
-  path: '/planner',
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NotesIndexRoute = NotesIndexRouteImport.update({
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsIndexRoute = JobsIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => NotesRoute,
+  getParentRoute: () => JobsRoute,
 } as any)
-const NotesIdRoute = NotesIdRouteImport.update({
+const JobsIdRoute = JobsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => NotesRoute,
+  getParentRoute: () => JobsRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -73,86 +97,114 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/alerts': typeof AlertsRoute
-  '/campus': typeof CampusRoute
-  '/jobs': typeof JobsRoute
+  '/account': typeof AccountRoute
+  '/applications': typeof ApplicationsRoute
+  '/dashboard': typeof DashboardRoute
+  '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
-  '/notes': typeof NotesRouteWithChildren
-  '/planner': typeof PlannerRoute
-  '/notes/$id': typeof NotesIdRoute
-  '/notes/': typeof NotesIndexRoute
+  '/pay': typeof PayRoute
+  '/pricing': typeof PricingRoute
+  '/profile': typeof ProfileRoute
+  '/saved': typeof SavedRoute
+  '/signup': typeof SignupRoute
+  '/jobs/$id': typeof JobsIdRoute
+  '/jobs/': typeof JobsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/alerts': typeof AlertsRoute
-  '/campus': typeof CampusRoute
-  '/jobs': typeof JobsRoute
+  '/account': typeof AccountRoute
+  '/applications': typeof ApplicationsRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/planner': typeof PlannerRoute
-  '/notes/$id': typeof NotesIdRoute
-  '/notes': typeof NotesIndexRoute
+  '/pay': typeof PayRoute
+  '/pricing': typeof PricingRoute
+  '/profile': typeof ProfileRoute
+  '/saved': typeof SavedRoute
+  '/signup': typeof SignupRoute
+  '/jobs/$id': typeof JobsIdRoute
+  '/jobs': typeof JobsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/alerts': typeof AlertsRoute
-  '/campus': typeof CampusRoute
-  '/jobs': typeof JobsRoute
+  '/account': typeof AccountRoute
+  '/applications': typeof ApplicationsRoute
+  '/dashboard': typeof DashboardRoute
+  '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
-  '/notes': typeof NotesRouteWithChildren
-  '/planner': typeof PlannerRoute
-  '/notes/$id': typeof NotesIdRoute
-  '/notes/': typeof NotesIndexRoute
+  '/pay': typeof PayRoute
+  '/pricing': typeof PricingRoute
+  '/profile': typeof ProfileRoute
+  '/saved': typeof SavedRoute
+  '/signup': typeof SignupRoute
+  '/jobs/$id': typeof JobsIdRoute
+  '/jobs/': typeof JobsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/alerts'
-    | '/campus'
+    | '/account'
+    | '/applications'
+    | '/dashboard'
     | '/jobs'
     | '/login'
-    | '/notes'
-    | '/planner'
-    | '/notes/$id'
-    | '/notes/'
+    | '/pay'
+    | '/pricing'
+    | '/profile'
+    | '/saved'
+    | '/signup'
+    | '/jobs/$id'
+    | '/jobs/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/alerts'
-    | '/campus'
-    | '/jobs'
+    | '/account'
+    | '/applications'
+    | '/dashboard'
     | '/login'
-    | '/planner'
-    | '/notes/$id'
-    | '/notes'
+    | '/pay'
+    | '/pricing'
+    | '/profile'
+    | '/saved'
+    | '/signup'
+    | '/jobs/$id'
+    | '/jobs'
     | '/api/auth/$'
   id:
     | '__root__'
     | '/'
-    | '/alerts'
-    | '/campus'
+    | '/account'
+    | '/applications'
+    | '/dashboard'
     | '/jobs'
     | '/login'
-    | '/notes'
-    | '/planner'
-    | '/notes/$id'
-    | '/notes/'
+    | '/pay'
+    | '/pricing'
+    | '/profile'
+    | '/saved'
+    | '/signup'
+    | '/jobs/$id'
+    | '/jobs/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AlertsRoute: typeof AlertsRoute
-  CampusRoute: typeof CampusRoute
-  JobsRoute: typeof JobsRoute
+  AccountRoute: typeof AccountRoute
+  ApplicationsRoute: typeof ApplicationsRoute
+  DashboardRoute: typeof DashboardRoute
+  JobsRoute: typeof JobsRouteWithChildren
   LoginRoute: typeof LoginRoute
-  NotesRoute: typeof NotesRouteWithChildren
-  PlannerRoute: typeof PlannerRoute
+  PayRoute: typeof PayRoute
+  PricingRoute: typeof PricingRoute
+  ProfileRoute: typeof ProfileRoute
+  SavedRoute: typeof SavedRoute
+  SignupRoute: typeof SignupRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -165,18 +217,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/alerts': {
-      id: '/alerts'
-      path: '/alerts'
-      fullPath: '/alerts'
-      preLoaderRoute: typeof AlertsRouteImport
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/campus': {
-      id: '/campus'
-      path: '/campus'
-      fullPath: '/campus'
-      preLoaderRoute: typeof CampusRouteImport
+    '/applications': {
+      id: '/applications'
+      path: '/applications'
+      fullPath: '/applications'
+      preLoaderRoute: typeof ApplicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jobs': {
@@ -193,33 +252,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/notes': {
-      id: '/notes'
-      path: '/notes'
-      fullPath: '/notes'
-      preLoaderRoute: typeof NotesRouteImport
+    '/pay': {
+      id: '/pay'
+      path: '/pay'
+      fullPath: '/pay'
+      preLoaderRoute: typeof PayRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/planner': {
-      id: '/planner'
-      path: '/planner'
-      fullPath: '/planner'
-      preLoaderRoute: typeof PlannerRouteImport
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/notes/': {
-      id: '/notes/'
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/': {
+      id: '/jobs/'
       path: '/'
-      fullPath: '/notes/'
-      preLoaderRoute: typeof NotesIndexRouteImport
-      parentRoute: typeof NotesRoute
+      fullPath: '/jobs/'
+      preLoaderRoute: typeof JobsIndexRouteImport
+      parentRoute: typeof JobsRoute
     }
-    '/notes/$id': {
-      id: '/notes/$id'
+    '/jobs/$id': {
+      id: '/jobs/$id'
       path: '/$id'
-      fullPath: '/notes/$id'
-      preLoaderRoute: typeof NotesIdRouteImport
-      parentRoute: typeof NotesRoute
+      fullPath: '/jobs/$id'
+      preLoaderRoute: typeof JobsIdRouteImport
+      parentRoute: typeof JobsRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -231,26 +311,30 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface NotesRouteChildren {
-  NotesIdRoute: typeof NotesIdRoute
-  NotesIndexRoute: typeof NotesIndexRoute
+interface JobsRouteChildren {
+  JobsIdRoute: typeof JobsIdRoute
+  JobsIndexRoute: typeof JobsIndexRoute
 }
 
-const NotesRouteChildren: NotesRouteChildren = {
-  NotesIdRoute: NotesIdRoute,
-  NotesIndexRoute: NotesIndexRoute,
+const JobsRouteChildren: JobsRouteChildren = {
+  JobsIdRoute: JobsIdRoute,
+  JobsIndexRoute: JobsIndexRoute,
 }
 
-const NotesRouteWithChildren = NotesRoute._addFileChildren(NotesRouteChildren)
+const JobsRouteWithChildren = JobsRoute._addFileChildren(JobsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AlertsRoute: AlertsRoute,
-  CampusRoute: CampusRoute,
-  JobsRoute: JobsRoute,
+  AccountRoute: AccountRoute,
+  ApplicationsRoute: ApplicationsRoute,
+  DashboardRoute: DashboardRoute,
+  JobsRoute: JobsRouteWithChildren,
   LoginRoute: LoginRoute,
-  NotesRoute: NotesRouteWithChildren,
-  PlannerRoute: PlannerRoute,
+  PayRoute: PayRoute,
+  PricingRoute: PricingRoute,
+  ProfileRoute: ProfileRoute,
+  SavedRoute: SavedRoute,
+  SignupRoute: SignupRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

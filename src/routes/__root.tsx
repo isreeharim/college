@@ -21,9 +21,13 @@ const queryClient = new QueryClient({
 });
 
 const fetchSessionUser = createServerFn({ method: "GET" }).handler(async () => {
-  const { getSessionUser } = await import("@/lib/auth/verify.server");
-  const u = await getSessionUser();
-  return u ? { id: u.id, email: u.email } : null;
+  try {
+    const { getSessionUser } = await import("@/lib/auth/verify.server");
+    const u = await getSessionUser();
+    return u ? { id: u.id, email: u.email } : null;
+  } catch {
+    return null;
+  }
 });
 
 export const Route = createRootRoute({
@@ -36,7 +40,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Notes, previous-year papers, internships, scholarships, attendance, and a campus board for Indian college students.",
+          "₹199 unlocks 24 hours of fresher job discovery. Your tracker stays forever.",
       },
       { name: "theme-color", content: "#F3EFE6" },
     ],

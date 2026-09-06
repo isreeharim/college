@@ -31,11 +31,17 @@ const rawDatabaseUrl =
 const databaseUrl =
   rawDatabaseUrl && rawDatabaseUrl.trim() ? rawDatabaseUrl : undefined;
 
+const bundledAsVercelFn =
+  typeof import.meta !== "undefined" &&
+  typeof import.meta.url === "string" &&
+  import.meta.url.includes(".vercel/output");
+
 const onServerless = Boolean(
-  typeof process !== "undefined" &&
-    (process.env.VERCEL ||
-      process.env.AWS_LAMBDA_FUNCTION_NAME ||
-      process.env.NITRO_PRESET === "vercel"),
+  bundledAsVercelFn ||
+    (typeof process !== "undefined" &&
+      (process.env.VERCEL ||
+        process.env.AWS_LAMBDA_FUNCTION_NAME ||
+        process.env.NITRO_PRESET === "vercel")),
 );
 
 /**

@@ -1,49 +1,29 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  Bell,
-  BookOpen,
+  Bookmark,
   Briefcase,
-  CalendarDays,
-  House,
-  MessagesSquare,
+  CircleUser,
+  LayoutDashboard,
   Search,
 } from "lucide-react";
 import { LogoMark } from "@/components/logo";
-import { CommandPalette } from "@/components/command-palette";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { SelectField } from "@/components/ui/select-field";
-import { upcomingDeadlines } from "@/lib/data/deadlines";
-import { COLLEGES } from "@/lib/data/colleges";
-import { useHydrateStores } from "@/lib/hydrate";
-import { usePrefs } from "@/lib/stores/prefs";
 import { UserButton } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
-import { cn, relativeDeadline } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-const NAV = [
-  { to: "/", label: "Home", icon: House },
-  { to: "/notes", label: "Notes", icon: BookOpen },
-  { to: "/jobs", label: "Jobs", icon: Briefcase },
-  { to: "/alerts", label: "Alerts", icon: Bell },
-  { to: "/planner", label: "Planner", icon: CalendarDays },
-  { to: "/campus", label: "Campus", icon: MessagesSquare },
+const APP_NAV = [
+  { to: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { to: "/jobs", label: "Jobs", icon: Search },
+  { to: "/saved", label: "Saved", icon: Bookmark },
+  { to: "/applications", label: "Tracker", icon: Briefcase },
+  { to: "/profile", label: "Profile", icon: CircleUser },
 ] as const;
-
-const MOBILE_NAV = NAV.filter((n) => n.to !== "/alerts");
-
-function isActive(pathname: string, to: string) {
-  if (to === "/") return pathname === "/";
-  return pathname === to || pathname.startsWith(`${to}/`);
-}
 
 function AuthSlot() {
   const { user, isPending } = useCurrentUserState();
-  if (isPending) {
-    return <div className="size-8 shrink-0 animate-pulse rounded-full bg-secondary" />;
-  }
+  if (isPending) return <div className="size-8 animate-pulse rounded-full bg-secondary" />;
   if (user) return <UserButton />;
   return (
     <Button asChild size="sm" variant="outline">
@@ -52,145 +32,52 @@ function AuthSlot() {
   );
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
-  useHydrateStores();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const college = usePrefs((s) => s.college);
-  const setCollege = usePrefs((s) => s.setCollege);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const soon = upcomingDeadlines(21);
-
+export function MarketingChrome({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-dvh bg-background text-foreground">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-border bg-sidebar px-4 py-6 md:flex">
-        <Link to="/" className="mb-8 flex items-center gap-2.5 px-2">
+    <div className="min-h-dvh bg-background">
+      <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background/90 px-4 backdrop-blur-sm">
+        <Link to="/" className="flex items-center gap-2">
           <LogoMark className="size-8 text-primary" />
-          <span className="font-display text-2xl font-medium tracking-tight">
-            College Centre
-          </span>
+          <span className="font-display text-lg font-medium">CollegeCentre</span>
         </Link>
-        <nav className="flex flex-1 flex-col gap-1">
-          {NAV.map((item) => {
+        <div className="ml-auto flex items-center gap-2">
+          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+            <Link to="/pricing">Pricing</Link>
+          </Button>
+          <AuthSlot />
+        </div>
+      </header>
+      {children}
+    </div>
+  );
+}
+
+export function StudentChrome({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <div className="min-h-dvh bg-background pb-20">
+      <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background/90 px-4 backdrop-blur-sm">
+        <Link to="/dashboard" className="flex items-center gap-2">
+          <LogoMark className="size-7 text-primary" />
+          <span className="font-display text-lg font-medium">CollegeCentre</span>
+        </Link>
+        <div className="ml-auto">
+          <AuthSlot />
+        </div>
+      </header>
+      <main className="mx-auto w-full max-w-lg px-4 py-5">{children}</main>
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 px-1 pt-1 pb-[max(0.4rem,env(safe-area-inset-bottom))] backdrop-blur-sm">
+        <ul className="mx-auto grid max-w-lg grid-cols-5">
+          {APP_NAV.map((item) => {
             const Icon = item.icon;
-            const active = isActive(pathname, item.to);
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors duration-150",
-                  active
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
-                )}
-              >
-                <Icon className="size-4" strokeWidth={1.75} />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <p className="px-3 pt-6 text-xs leading-relaxed text-faint">
-          Notes, jobs, scholarships, and a campus board — kept in one vault.
-        </p>
-      </aside>
-
-      <div className="md:pl-60">
-        <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-border bg-background/90 px-4 backdrop-blur-sm md:h-16 md:px-8">
-          <Link to="/" className="flex items-center gap-2 md:hidden">
-            <LogoMark className="size-7 text-primary" />
-            <span className="font-display text-xl font-medium">College Centre</span>
-          </Link>
-          <div className="ml-auto flex items-center gap-2">
-            <SelectField
-              aria-label="Your campus"
-              value={college}
-              onChange={(e) => setCollege(e.target.value)}
-              className="hidden h-9 max-w-44 text-xs md:block"
-            >
-              {COLLEGES.filter((c) => c !== "Any campus").map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </SelectField>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setSearchOpen(true)}
-              className="hidden min-w-48 justify-start gap-2 text-muted-foreground md:inline-flex"
-            >
-              <Search className="size-4" />
-              Search
-              <kbd className="ml-auto rounded-md bg-secondary px-1.5 py-0.5 font-mono text-[10px] text-faint">
-                ⌘K
-              </kbd>
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              className="md:hidden"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-            >
-              <Search className="size-4" />
-            </Button>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon-sm"
-                  className="relative"
-                  aria-label="Upcoming deadlines"
-                >
-                  <Bell className="size-4" />
-                  {soon.length > 0 ? (
-                    <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-destructive" />
-                  ) : null}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent>
-                <p className="mb-2 px-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  Next 3 weeks
-                </p>
-                <ul className="flex flex-col gap-1">
-                  {soon.slice(0, 6).map((d) => (
-                    <li key={d.id}>
-                      <Link
-                        to="/alerts"
-                        className="flex items-start justify-between gap-3 rounded-xl px-2 py-2 hover:bg-secondary"
-                      >
-                        <span className="text-sm leading-snug">{d.title}</span>
-                        <Badge variant="outline">{relativeDeadline(d.date)}</Badge>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </PopoverContent>
-            </Popover>
-            <AuthSlot />
-          </div>
-        </header>
-
-        <main className="mx-auto w-full max-w-6xl px-4 py-6 pb-28 md:px-8 md:py-8 md:pb-12">
-          {children}
-        </main>
-      </div>
-
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 px-2 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-sm md:hidden">
-        <ul className="grid grid-cols-5">
-          {MOBILE_NAV.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(pathname, item.to);
+            const active =
+              pathname === item.to || pathname.startsWith(`${item.to}/`);
             return (
               <li key={item.to}>
                 <Link
                   to={item.to}
                   className={cn(
-                    "flex min-h-11 flex-col items-center justify-center gap-0.5 text-[10px] font-medium",
+                    "flex min-h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-medium",
                     active ? "text-primary" : "text-muted-foreground",
                   )}
                 >
@@ -202,8 +89,20 @@ export function AppShell({ children }: { children: ReactNode }) {
           })}
         </ul>
       </nav>
-
-      <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
+}
+
+export function AppShell({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const student =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/jobs") ||
+    pathname.startsWith("/saved") ||
+    pathname.startsWith("/applications") ||
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/account") ||
+    pathname.startsWith("/pay");
+  if (student) return <StudentChrome>{children}</StudentChrome>;
+  return <MarketingChrome>{children}</MarketingChrome>;
 }
