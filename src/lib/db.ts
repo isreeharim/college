@@ -3,6 +3,15 @@ import { pendingMigrations } from "../../scripts/migration-plan.mjs";
 /** Which database backend is active. */
 export type DbSource = "neon" | "pglite";
 
+function firstEnv(...keys: string[]) {
+  if (typeof process === "undefined") return undefined;
+  for (const key of keys) {
+    const value = process.env[key]?.trim();
+    if (value) return value;
+  }
+  return undefined;
+}
+
 // Public origin + session secret for Vercel / custom domains. Must run before
 // `@/lib/auth/server` reads process.env (that module imports this file first).
 if (typeof process !== "undefined") {
@@ -21,6 +30,17 @@ if (typeof process !== "undefined") {
     process.env.BETTER_AUTH_SECRET =
       process.env.VERCEL_PROJECT_ID ||
       "college-centre-session-secret";
+  }
+  // Vercel Neon / Marketplace often injects POSTGRES_URL instead of DATABASE_URL.
+  if (!process.env.DATABASE_URL?.trim()) {
+    const alias = firstEnv(
+      "POSTGRES_URL",
+      "POSTGRES_PRISMA_URL",
+      "DATABASE_URL_UNPOOLED",
+      "POSTGRES_URL_NON_POOLING",
+      "POSTGRES_URL_NO_SSL",
+    );
+    if (alias) process.env.DATABASE_URL = alias;
   }
 }
 
@@ -130,7 +150,7 @@ function createNeonSql(): Promise<Sql> {
 async function createPgliteSql(): Promise<Sql> {
   if (onServerless) {
     throw new Error(
-      "PGLite is not available on Vercel. Set DATABASE_URL to a Postgres provider.",
+      "Postgres is not configured on this deploy. In Vercel → Settings → Environment Variables, set DATABASE_URL or POSTGRES_URL to your Neon connection string (Production + Preview).",
     );
   }
   globalRef.__pgliteInstance__ ??= (async () => {
