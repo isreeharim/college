@@ -228,7 +228,32 @@ export const listJobs = createServerFn({ method: "GET" })
       return { locked: true as const, access, jobs: [] as JobCard[] };
     }
     const sql = await getSql();
-    const rows = await sql<JobRow>`select * from jobs order by posted_at desc`;
+    const q = data.q.trim();
+    const clauses = ["1=1"];
+    const params: unknown[] = [];
+    const add = (fragment: string, value: unknown) => {
+      params.push(value);
+      clauses.push(fragment.replace("?", `$${params.length}`));
+    };
+    if (q) {
+      add(
+        "(title ilike ? or company ilike ? or skills ilike ? or category ilike ?)",
+        `%${q}%`,
+      );
+      params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+      clauses[clauses.length - 1] = `(title ilike $${params.length - 3} or company ilike $${params.length - 2} or skills ilike $${params.length - 1} or category ilike $${params.length})`;
+    }
+    if (data.location) add("location ilike ?", `%${data.location}%`);
+    if (data.workMode && data.workMode !== "Any") add("work_mode = ?", data.workMode);
+    if (data.category) add("category = ?", data.category);
+    if (data.fresherOnly) clauses.push("fresher_ok = true");
+    if (data.minSalary) add("salary_min >= ?", data.minSalary);
+    if (data.experience === "0") clauses.push("experience ilike '%0%'");
+    if (data.experience === "1") clauses.push("(experience ilike '%0–1%' or experience ilike '%0-1%' or experience ilike '%1 year%')");
+    const rows = await sql.query<JobRow>(
+      `select * from jobs where ${clauses.join(" and ")} order by posted_at desc limit 150`,
+      params,
+    );
     const jobs = rows.map(toJob);
     const profile = await loadProfile(context.userId);
     const saved = await sql<{ job_id: string }>`select job_id from saved_jobs where user_id = ${context.userId}`;
@@ -237,21 +262,7 @@ export const listJobs = createServerFn({ method: "GET" })
     `;
     const savedSet = new Set(saved.map((s) => s.job_id));
     const appMap = new Map(apps.map((a) => [a.job_id, a.status as AppStatus]));
-    const q = data.q.trim().toLowerCase();
-    const list = jobs.filter((job) => {
-      if (q) {
-        const blob = `${job.title} ${job.company} ${job.skills} ${job.category}`.toLowerCase();
-        if (!blob.includes(q)) return false;
-      }
-      if (data.location && !job.location.toLowerCase().includes(data.location.toLowerCase())) return false;
-      if (data.workMode && data.workMode !== "Any" && job.workMode !== data.workMode) return false;
-      if (data.category && job.category !== data.category) return false;
-      if (data.fresherOnly && !job.fresherOk) return false;
-      if (data.minSalary && job.salaryMin < data.minSalary) return false;
-      if (data.experience === "0" && !/0/.test(job.experience)) return false;
-      if (data.experience === "1" && !/0–1|0-1|1 year/.test(job.experience)) return false;
-      return true;
-    });
+    const list = jobs;
     const cards: JobCard[] = list.map((job) => ({
       ...job,
       match: scoreJob(profile, job),
@@ -437,7 +448,7 @@ export const dashboardStats = createServerFn({ method: "GET" })
         recommended: [] as JobCard[],
       };
     }
-    const rows = await sql<JobRow>`select * from jobs order by posted_at desc`;
+    const rows = await sql<JobRow>`select * from jobs order by posted_at desc limit 250`;
     const jobs = rows.map(toJob);
     const profile = await loadProfile(context.userId);
     const savedRows = await sql<{ job_id: string }>`select job_id from saved_jobs where user_id = ${context.userId}`;

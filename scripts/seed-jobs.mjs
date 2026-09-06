@@ -118,12 +118,18 @@ const companies = [
   "Zoho", "Freshworks", "Razorpay", "PhonePe", "Paytm", "Flipkart", "Amazon", "Microsoft",
   "Google", "IBM", "Oracle", "SAP Labs", "Adobe", "ServiceNow", "Salesforce", "Atlassian",
   "Swiggy", "Zomato", "Meesho", "Nykaa", "Myntra", "CRED", "Groww", "Zerodha",
-  "BYJU'S", "Unacademy", "PhysicsWallah", "upGrad", "WhiteHat Jr",
+  "BYJU'S", "Unacademy", "PhysicsWallah", "upGrad",
   "Tata Motors", "Mahindra", "L&T", "Bosch", "Siemens", "Schneider Electric", "GE Vernova",
   "Deloitte", "EY", "KPMG", "PwC", "McKinsey", "BCG",
   "HDFC Bank", "ICICI Bank", "Axis Bank", "SBI", "Kotak",
   "Sun Pharma", "Dr Reddy's", "Cipla", "Apollo Hospitals",
   "Indian Oil", "Reliance", "Adani", "JSW", "Vedanta",
+  "Capgemini", "Persistent", "Mphasis", "Hexaware", "Birlasoft", "Sonata Software",
+  "Thoughtworks", "Publicis Sapient", "EPAM", "Nagarro", "GlobalLogic", "Virtusa",
+  "Udaan", "Dunzo", "ShareChat", "MX Player", "Jio", "Airtel", "Nokia", "Qualcomm",
+  "Intel", "AMD", "Nvidia", "Cisco", "Dell", "HP", "Lenovo",
+  "Ola", "Uber", "Blinkit", "BigBasket", "Policybazaar", "Acko", "Digit Insurance",
+  "Lenskart", "Mamaearth", "boAt", "Noise", "CarDekho", "Cars24",
   "TechNova", "LumenForge", "Papertrail", "Northstar Insights", "Kiln Labs", "Harbour & Co",
   "Nimbus Apps", "Stackyard", "OpenSyllabus", "Aether Motors", "Quiet Studio", "Redbark",
   "Plica Foods", "Sable Systems", "Gridline", "FolioPay", "Kitewatch", "Harborpoint Infra",
@@ -209,7 +215,7 @@ function buildJobs(count) {
       job_type: jobType,
       posted_at: dateOffset(i),
       deadline: deadline(i),
-      description: `${title} at ${company} in ${location}. ${cat.category} role for campus hires and first-job seekers. Work on live products with a mentor. Apply from CollegeCentre — employer page opens in a new tab.`,
+      description: `${title} at ${company} (${location}). ${cat.category} opening for students and freshers in India. Team size varies by site. Apply via the employer career search linked from CollegeCentre.`,
       fresher_ok: fresher,
       application_url: `https://www.google.com/search?q=${encodeURIComponent(`${company} ${title} careers India`)}`,
       source: i % 4 === 0 ? "Campus" : i % 4 === 1 ? "Company career page" : "CollegeCentre",
@@ -244,7 +250,7 @@ on conflict (id) do update set
 `;
 
 const pool = new pg.Pool({ connectionString: url, ssl: { rejectUnauthorized: false }, max: 4 });
-const jobs = buildJobs(1000);
+const jobs = buildJobs(10000);
 let inserted = 0;
 const batchSize = 50;
 for (let i = 0; i < jobs.length; i += batchSize) {
