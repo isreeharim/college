@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { authClient, authEnabled } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -29,8 +30,12 @@ function Login() {
 
   return (
     <div className="mx-auto w-full max-w-md px-4 py-10">
-      <h1 className="font-display text-3xl font-medium tracking-tight">Sign in</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Your tracker stays with this account.</p>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-3xl font-extrabold">Sign in</CardTitle>
+          <CardDescription>Your tracker stays with this account.</CardDescription>
+        </CardHeader>
+        <CardContent>
       {!authEnabled ? (
         <p className="mt-6 text-sm text-muted-foreground">Sign-in is disabled.</p>
       ) : (
@@ -73,6 +78,8 @@ function Login() {
           </form>
         </div>
       )}
+        </CardContent>
+      </Card>
       <p className="mt-6 text-center text-sm text-muted-foreground">
         New here?{" "}
         <Link to="/signup" className="text-foreground underline-offset-4 hover:underline">

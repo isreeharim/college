@@ -5,7 +5,9 @@ import { applyToJob, listJobs, toggleSave } from "@/lib/hunt";
 import { JobCard } from "@/components/job-card";
 import { ExpiredGate } from "@/components/pass-lock";
 import { Input } from "@/components/ui/input";
-import { SelectField } from "@/components/ui/select-field";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CATEGORIES, WORK_MODES } from "@/lib/types";
 import { RedirectToSignIn } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
@@ -18,16 +20,25 @@ function JobsPage() {
   const [q, setQ] = useState("");
   const [location, setLocation] = useState("");
   const [workMode, setWorkMode] = useState("Any");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("all");
   const [fresherOnly, setFresherOnly] = useState(false);
-  const [minSalary, setMinSalary] = useState(0);
-  const [experience, setExperience] = useState("");
+  const [minSalary, setMinSalary] = useState("0");
+  const [experience, setExperience] = useState("any");
   const [sort, setSort] = useState<"match" | "newest">("match");
   const jobs = useQuery({
     queryKey: ["jobs", q, location, workMode, category, fresherOnly, minSalary, experience, sort],
     queryFn: () =>
       listJobs({
-        data: { q, location, workMode, category, fresherOnly, minSalary, experience, sort },
+        data: {
+          q,
+          location,
+          workMode,
+          category: category === "all" ? "" : category,
+          fresherOnly,
+          minSalary: Number(minSalary),
+          experience: experience === "any" ? "" : experience,
+          sort,
+        },
       }),
   });
   const save = useMutation({
@@ -48,55 +59,75 @@ function JobsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-3xl font-medium tracking-tight">Find jobs</h1>
-      <Input placeholder="Keyword, company, skill" value={q} onChange={(e) => setQ(e.target.value)} />
+      <h1 className="text-3xl font-extrabold tracking-tight">Find jobs</h1>
+      <Input placeholder="Search jobs, skills, companies..." value={q} onChange={(e) => setQ(e.target.value)} />
       <div className="grid grid-cols-2 gap-2">
         <Input placeholder="City" value={location} onChange={(e) => setLocation(e.target.value)} />
-        <SelectField value={workMode} onChange={(e) => setWorkMode(e.target.value)}>
-          {WORK_MODES.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </SelectField>
-        <SelectField value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">All categories</option>
-          {CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </SelectField>
-        <SelectField value={String(minSalary)} onChange={(e) => setMinSalary(Number(e.target.value))}>
-          <option value="0">Any salary</option>
-          <option value="3">₹3 LPA+</option>
-          <option value="4">₹4 LPA+</option>
-          <option value="5">₹5 LPA+</option>
-          <option value="6">₹6 LPA+</option>
-        </SelectField>
-        <SelectField value={experience} onChange={(e) => setExperience(e.target.value)}>
-          <option value="">Any experience</option>
-          <option value="0">0 years / fresher</option>
-          <option value="1">0–1 years</option>
-        </SelectField>
-        <SelectField value={sort} onChange={(e) => setSort(e.target.value as "match" | "newest")}>
-          <option value="match">Best match</option>
-          <option value="newest">Newest</option>
-        </SelectField>
-        <label className="col-span-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-card px-3 text-sm">
-          <input type="checkbox" checked={fresherOnly} onChange={(e) => setFresherOnly(e.target.checked)} />
-          Freshers only
+        <Select value={workMode} onValueChange={setWorkMode}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {WORK_MODES.map((m) => (
+              <SelectItem key={m} value={m}>
+                {m}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={category} onValueChange={setCategory}>
+          <SelectTrigger>
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All categories</SelectItem>
+            {CATEGORIES.map((c) => (
+              <SelectItem key={c} value={c}>
+                {c}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={minSalary} onValueChange={setMinSalary}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="0">Any salary</SelectItem>
+            <SelectItem value="3">₹3 LPA+</SelectItem>
+            <SelectItem value="4">₹4 LPA+</SelectItem>
+            <SelectItem value="5">₹5 LPA+</SelectItem>
+            <SelectItem value="6">₹6 LPA+</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={experience} onValueChange={setExperience}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="any">Any experience</SelectItem>
+            <SelectItem value="0">0 years / fresher</SelectItem>
+            <SelectItem value="1">0–1 years</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={sort} onValueChange={(v) => setSort(v as "match" | "newest")}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="match">Best match</SelectItem>
+            <SelectItem value="newest">Newest</SelectItem>
+          </SelectContent>
+        </Select>
+        <label className="col-span-2 flex min-h-11 items-center gap-2 rounded-[10px] border border-border bg-card px-3 text-sm">
+          <Checkbox checked={fresherOnly} onCheckedChange={(v) => setFresherOnly(v === true)} />
+          <Label className="font-normal">Freshers only</Label>
         </label>
       </div>
       {jobs.data?.locked ? <ExpiredGate /> : null}
       {jobs.data && !jobs.data.locked
         ? jobs.data.jobs.map((job) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              onSave={() => save.mutate(job.id)}
-              onApply={() => apply.mutate(job.id)}
-            />
+            <JobCard key={job.id} job={job} onSave={() => save.mutate(job.id)} onApply={() => apply.mutate(job.id)} />
           ))
         : null}
       {jobs.data && !jobs.data.locked && jobs.data.jobs.length === 0 ? (

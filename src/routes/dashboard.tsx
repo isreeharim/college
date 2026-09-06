@@ -4,6 +4,7 @@ import { dashboardStats, getHuntState } from "@/lib/hunt";
 import { JobCard } from "@/components/job-card";
 import { ExpiredGate, PassChip } from "@/components/pass-lock";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { RedirectToSignIn } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 
@@ -75,9 +76,11 @@ function Dashboard() {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-2xl border border-border bg-card px-4 py-3 shadow-card">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="font-display mt-1 text-2xl font-medium">{value}</dd>
-    </div>
+    <Card>
+      <CardContent className="px-4 py-3">
+        <dt className="text-xs text-muted-foreground">{label}</dt>
+        <dd className="mt-1 text-2xl font-extrabold">{value}</dd>
+      </CardContent>
+    </Card>
   );
 }
