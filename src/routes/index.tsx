@@ -39,6 +39,11 @@ function Landing() {
           24 hours end, discovery locks. Saved and applied jobs stay yours.
         </li>
       </ul>
+      <ol className="mt-10 space-y-3 border-t border-border pt-8 text-sm">
+        <li><span className="font-medium">1.</span> Create an account and profile.</li>
+        <li><span className="font-medium">2.</span> Unlock 24 hours for ₹199.</li>
+        <li><span className="font-medium">3.</span> Find, save, apply, track — then keep the tracker.</li>
+      </ol>
     </div>
   );
 }

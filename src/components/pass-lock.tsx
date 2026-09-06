@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import type { Access } from "@/lib/types";
@@ -10,7 +11,18 @@ export function formatRemaining(ms: number) {
 }
 
 export function PassChip({ access }: { access: Access }) {
-  if (!access.active) {
+  const [left, setLeft] = useState(access.remainingMs);
+  useEffect(() => {
+    setLeft(access.remainingMs);
+    if (!access.active || !access.expiresAt) return;
+    const end = new Date(access.expiresAt).getTime();
+    const tick = () => setLeft(Math.max(0, end - Date.now()));
+    tick();
+    const id = window.setInterval(tick, 30_000);
+    return () => window.clearInterval(id);
+  }, [access.active, access.expiresAt, access.remainingMs]);
+
+  if (!access.active || left <= 0) {
     return (
       <span className="rounded-full bg-secondary px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
         Pass expired
@@ -19,7 +31,7 @@ export function PassChip({ access }: { access: Access }) {
   }
   return (
     <span className="rounded-full bg-accent px-2.5 py-1 text-[11px] font-medium text-primary">
-      {formatRemaining(access.remainingMs)} left
+      {formatRemaining(left)} left
     </span>
   );
 }

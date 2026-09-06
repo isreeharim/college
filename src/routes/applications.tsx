@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listApplications, updateApplication } from "@/lib/hunt";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select-field";
 import { Textarea } from "@/components/ui/textarea";
 import { STATUSES } from "@/lib/types";
@@ -15,8 +16,12 @@ function AppsPage() {
   const qc = useQueryClient();
   const apps = useQuery({ queryKey: ["apps"], queryFn: () => listApplications() });
   const update = useMutation({
-    mutationFn: (payload: { jobId: string; status: (typeof STATUSES)[number]; notes: string }) =>
-      updateApplication({ data: { ...payload, reminder: "" } }),
+    mutationFn: (payload: {
+      jobId: string;
+      status: (typeof STATUSES)[number];
+      notes: string;
+      reminder: string;
+    }) => updateApplication({ data: payload }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["apps"] }),
   });
 
@@ -33,7 +38,9 @@ function AppsPage() {
         ? apps.data.map((item) => (
             <article key={item.appId} className="rounded-2xl border border-border bg-card p-4 shadow-card">
               <h2 className="font-display text-lg font-medium">{item.job.title}</h2>
-              <p className="text-sm text-muted-foreground">{item.job.company}</p>
+              <p className="text-sm text-muted-foreground">
+                {item.job.company} · {item.job.location}
+              </p>
               <Badge variant="outline" className="mt-2">
                 {item.status}
               </Badge>
@@ -45,6 +52,7 @@ function AppsPage() {
                     jobId: item.job.id,
                     status: e.target.value as (typeof STATUSES)[number],
                     notes: item.notes,
+                    reminder: item.reminder,
                   })
                 }
               >
@@ -63,6 +71,20 @@ function AppsPage() {
                     jobId: item.job.id,
                     status: item.status,
                     notes: e.target.value,
+                    reminder: item.reminder,
+                  })
+                }
+              />
+              <Input
+                className="mt-3"
+                defaultValue={item.reminder}
+                placeholder="Reminder — e.g. follow up Friday"
+                onBlur={(e) =>
+                  update.mutate({
+                    jobId: item.job.id,
+                    status: item.status,
+                    notes: item.notes,
+                    reminder: e.target.value,
                   })
                 }
               />

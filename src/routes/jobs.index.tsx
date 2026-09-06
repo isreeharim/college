@@ -20,11 +20,14 @@ function JobsPage() {
   const [workMode, setWorkMode] = useState("Any");
   const [category, setCategory] = useState("");
   const [fresherOnly, setFresherOnly] = useState(false);
+  const [minSalary, setMinSalary] = useState(0);
+  const [experience, setExperience] = useState("");
+  const [sort, setSort] = useState<"match" | "newest">("match");
   const jobs = useQuery({
-    queryKey: ["jobs", q, location, workMode, category, fresherOnly],
+    queryKey: ["jobs", q, location, workMode, category, fresherOnly, minSalary, experience, sort],
     queryFn: () =>
       listJobs({
-        data: { q, location, workMode, category, fresherOnly, minSalary: 0 },
+        data: { q, location, workMode, category, fresherOnly, minSalary, experience, sort },
       }),
   });
   const save = useMutation({
@@ -64,7 +67,23 @@ function JobsPage() {
             </option>
           ))}
         </SelectField>
-        <label className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 text-sm">
+        <SelectField value={String(minSalary)} onChange={(e) => setMinSalary(Number(e.target.value))}>
+          <option value="0">Any salary</option>
+          <option value="3">₹3 LPA+</option>
+          <option value="4">₹4 LPA+</option>
+          <option value="5">₹5 LPA+</option>
+          <option value="6">₹6 LPA+</option>
+        </SelectField>
+        <SelectField value={experience} onChange={(e) => setExperience(e.target.value)}>
+          <option value="">Any experience</option>
+          <option value="0">0 years / fresher</option>
+          <option value="1">0–1 years</option>
+        </SelectField>
+        <SelectField value={sort} onChange={(e) => setSort(e.target.value as "match" | "newest")}>
+          <option value="match">Best match</option>
+          <option value="newest">Newest</option>
+        </SelectField>
+        <label className="col-span-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-card px-3 text-sm">
           <input type="checkbox" checked={fresherOnly} onChange={(e) => setFresherOnly(e.target.checked)} />
           Freshers only
         </label>

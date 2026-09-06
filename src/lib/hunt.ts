@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { getSql } from "@/lib/db";
+import { ensureHuntSchema } from "@/lib/ensure-hunt-schema";
 import { scoreJob } from "@/lib/match";
 import type { Access, AppStatus, Job, JobCard, Profile } from "@/lib/types";
 import { STATUSES } from "@/lib/types";
@@ -116,6 +117,7 @@ async function loadProfile(userId: string): Promise<Profile | null> {
 export const getHuntState = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
+    await ensureHuntSchema();
     const [profile, access] = await Promise.all([
       loadProfile(context.userId),
       loadAccess(context.userId),
@@ -143,6 +145,7 @@ export const saveProfile = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator(profileInput)
   .handler(async ({ context, data }) => {
+    await ensureHuntSchema();
     const sql = await getSql();
     await sql.query(
       `insert into profiles
@@ -186,6 +189,7 @@ export const saveProfile = createServerFn({ method: "POST" })
 export const buyPass = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
+    await ensureHuntSchema();
     const sql = await getSql();
     const started = new Date();
     const expires = new Date(started.getTime() + PASS_MS);
@@ -210,12 +214,15 @@ const listInput = z.object({
   category: z.string().optional().default(""),
   fresherOnly: z.boolean().optional().default(false),
   minSalary: z.number().optional().default(0),
+  experience: z.string().optional().default(""),
+  sort: z.enum(["match", "newest"]).optional().default("match"),
 });
 
 export const listJobs = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .validator(listInput)
   .handler(async ({ context, data }) => {
+    await ensureHuntSchema();
     const access = await loadAccess(context.userId);
     if (!access.active) {
       return { locked: true as const, access, jobs: [] as JobCard[] };
@@ -231,7 +238,7 @@ export const listJobs = createServerFn({ method: "GET" })
     const savedSet = new Set(saved.map((s) => s.job_id));
     const appMap = new Map(apps.map((a) => [a.job_id, a.status as AppStatus]));
     const q = data.q.trim().toLowerCase();
-    let list = jobs.filter((job) => {
+    const list = jobs.filter((job) => {
       if (q) {
         const blob = `${job.title} ${job.company} ${job.skills} ${job.category}`.toLowerCase();
         if (!blob.includes(q)) return false;
@@ -241,6 +248,8 @@ export const listJobs = createServerFn({ method: "GET" })
       if (data.category && job.category !== data.category) return false;
       if (data.fresherOnly && !job.fresherOk) return false;
       if (data.minSalary && job.salaryMin < data.minSalary) return false;
+      if (data.experience === "0" && !/0/.test(job.experience)) return false;
+      if (data.experience === "1" && !/0–1|0-1|1 year/.test(job.experience)) return false;
       return true;
     });
     const cards: JobCard[] = list.map((job) => ({
@@ -249,7 +258,8 @@ export const listJobs = createServerFn({ method: "GET" })
       saved: savedSet.has(job.id),
       applicationStatus: appMap.get(job.id) ?? null,
     }));
-    cards.sort((a, b) => b.match.total - a.match.total);
+    if (data.sort === "newest") cards.sort((a, b) => b.postedAt.localeCompare(a.postedAt));
+    else cards.sort((a, b) => b.match.total - a.match.total || b.postedAt.localeCompare(a.postedAt));
     return { locked: false as const, access, jobs: cards };
   });
 
@@ -257,6 +267,7 @@ export const getJob = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .validator(z.object({ id: z.string() }))
   .handler(async ({ context, data }) => {
+    await ensureHuntSchema();
     const sql = await getSql();
     const rows = await sql<JobRow>`select * from jobs where id = ${data.id} limit 1`;
     const row = rows[0];
@@ -280,18 +291,14 @@ export const getJob = createServerFn({ method: "GET" })
       saved: saved.length > 0,
       applicationStatus: (applied[0]?.status as AppStatus) ?? null,
     };
-    return {
-      ok: true as const,
-      access,
-      job: card,
-      notes: applied[0]?.notes ?? "",
-    };
+    return { ok: true as const, access, job: card, notes: applied[0]?.notes ?? "" };
   });
 
 export const toggleSave = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator(z.object({ jobId: z.string() }))
   .handler(async ({ context, data }) => {
+    await ensureHuntSchema();
     const sql = await getSql();
     const existing = await sql<{ id: number }>`
       select id from saved_jobs where user_id = ${context.userId} and job_id = ${data.jobId} limit 1
@@ -310,6 +317,7 @@ export const applyToJob = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator(z.object({ jobId: z.string() }))
   .handler(async ({ context, data }) => {
+    await ensureHuntSchema();
     const access = await loadAccess(context.userId);
     if (!access.active) throw new Error("Pass expired");
     const sql = await getSql();
@@ -329,10 +337,11 @@ export const applyToJob = createServerFn({ method: "POST" })
 export const listSaved = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
+    await ensureHuntSchema();
     const sql = await getSql();
     const profile = await loadProfile(context.userId);
-    const rows = await sql<JobRow & { saved_at: string }>`
-      select j.*, s.created_at::text as saved_at
+    const rows = await sql<JobRow>`
+      select j.*
       from saved_jobs s
       join jobs j on j.id = s.job_id
       where s.user_id = ${context.userId}
@@ -356,6 +365,7 @@ export const listSaved = createServerFn({ method: "GET" })
 export const listApplications = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
+    await ensureHuntSchema();
     const sql = await getSql();
     const profile = await loadProfile(context.userId);
     const rows = await sql<
@@ -396,6 +406,7 @@ export const updateApplication = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ context, data }) => {
+    await ensureHuntSchema();
     const sql = await getSql();
     await sql.query(
       `update applications
@@ -409,6 +420,7 @@ export const updateApplication = createServerFn({ method: "POST" })
 export const dashboardStats = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
+    await ensureHuntSchema();
     const access = await loadAccess(context.userId);
     const sql = await getSql();
     const saved = await sql<{ c: number }>`select count(*)::int as c from saved_jobs where user_id = ${context.userId}`;
