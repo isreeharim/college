@@ -6,6 +6,7 @@ import {
   CircleUser,
   LayoutDashboard,
   Search,
+  Sparkles,
 } from "lucide-react";
 import { Wordmark } from "@/components/logo";
 import { UserButton } from "@/lib/auth/gates";
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 const APP_NAV = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard },
   { to: "/jobs", label: "Jobs", icon: Search },
+  { to: "/agent", label: "Agent", icon: Sparkles },
   { to: "/saved", label: "Saved", icon: Bookmark },
   { to: "/applications", label: "Tracker", icon: Briefcase },
   { to: "/profile", label: "Profile", icon: CircleUser },
@@ -66,7 +68,7 @@ export function StudentChrome({ children }: { children: ReactNode }) {
       </header>
       <main className="mx-auto w-full max-w-lg px-4 py-5 md:max-w-5xl">{children}</main>
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card px-1 pt-1 pb-[max(0.4rem,env(safe-area-inset-bottom))]">
-        <ul className="mx-auto grid max-w-lg grid-cols-5">
+        <ul className="mx-auto grid max-w-lg grid-cols-6">
           {APP_NAV.map((item) => {
             const Icon = item.icon;
             const active =
@@ -97,7 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const student =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/jobs") ||
-    pathname.startsWith("/saved") ||
+    pathname.startsWith("/agent") ||
     pathname.startsWith("/applications") ||
     pathname.startsWith("/profile") ||
     pathname.startsWith("/account") ||

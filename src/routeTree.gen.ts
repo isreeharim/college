@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as AgentRouteImport } from './routes/agent'
 import { Route as ApplicationsRouteImport } from './routes/applications'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as JobsRouteImport } from './routes/jobs'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentRoute = AgentRouteImport.update({
+  id: '/agent',
+  path: '/agent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApplicationsRoute = ApplicationsRouteImport.update({
@@ -98,6 +104,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/agent': typeof AgentRoute
   '/applications': typeof ApplicationsRoute
   '/dashboard': typeof DashboardRoute
   '/jobs': typeof JobsRouteWithChildren
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/agent': typeof AgentRoute
   '/applications': typeof ApplicationsRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/agent': typeof AgentRoute
   '/applications': typeof ApplicationsRoute
   '/dashboard': typeof DashboardRoute
   '/jobs': typeof JobsRouteWithChildren
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
+    | '/agent'
     | '/applications'
     | '/dashboard'
     | '/jobs'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
+    | '/agent'
     | '/applications'
     | '/dashboard'
     | '/login'
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/account'
+    | '/agent'
     | '/applications'
     | '/dashboard'
     | '/jobs'
@@ -196,6 +208,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
+  AgentRoute: typeof AgentRoute
   ApplicationsRoute: typeof ApplicationsRoute
   DashboardRoute: typeof DashboardRoute
   JobsRoute: typeof JobsRouteWithChildren
@@ -222,6 +235,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent': {
+      id: '/agent'
+      path: '/agent'
+      fullPath: '/agent'
+      preLoaderRoute: typeof AgentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/applications': {
@@ -326,6 +346,7 @@ const JobsRouteWithChildren = JobsRoute._addFileChildren(JobsRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
+  AgentRoute: AgentRoute,
   ApplicationsRoute: ApplicationsRoute,
   DashboardRoute: DashboardRoute,
   JobsRoute: JobsRouteWithChildren,
